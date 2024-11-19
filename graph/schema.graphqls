@@ -1,0 +1,58 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type Flight {
+    uniqueId: String!
+    tailNumber: String!
+    flightNumber: String!
+    scheduledDepartureAirport: String!
+    scheduledArrivalAirport: String!
+    std: String!
+    sta: String!
+    offsetDa: String!
+    offsetAa: String!
+    departureGate: String!
+    actualTimes: ActualTimes!
+    estimatedTimes: EstimatedTimes!
+    delays: [Delay!]
+    fuels: [Fuel!]
+}
+
+type ActualTimes {
+    actualBlockOff: String!
+    actualTakeOff: String!
+    actualTouchDown: String!
+    actualBlockOn: String!
+}
+
+type EstimatedTimes {
+    estimatedBlockOff: String!
+    estimatedTakeOff: String!
+    estimatedTouchDown: String!
+    estimatedBlockOn: String!
+}
+
+type Delay {
+    code: String!
+    code2: String!
+    minutes: String!
+}
+
+type Fuel {
+    type: String!
+    source: String!
+    quantity: String!
+    quantityUnit: String!
+    density: String!
+    densityUnit: String!
+}
+
+
+type Query {
+  flight(uniqueId: String!): Flight!
+}
+
+#type Mutation {
+#  createTodo(input: NewTodo!): Todo!
+#}

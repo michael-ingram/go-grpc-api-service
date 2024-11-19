@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+package navblue;
+option go_package = "../pb";
+
+service NavblueService {
+  rpc FlightById (FlightByIdRequest) returns (FlightByIdResponse);
+}
+
+message FlightByIdRequest {
+  string unique_id = 1;
+}
+
+message FlightByIdResponse {
+  string unique_id = 1;
+  string flight_date = 2;
+  string tail_number = 3;
+  string airline_designator = 4;
+  string flight_number = 5;
+  string onward_flight_number = 6;
+  string status = 7;
+  string scheduled_departure_airport = 8;
+  string scheduled_arrival_airport = 9;
+  string std = 10;
+  string sta = 11;
+  string std_local = 12;
+  string sta_local = 13;
+  string offset_da = 14;
+  string offset_aa = 15;
+  string aircraft_manufacture = 16;
+  string aircraft_type = 17;
+  string aircraft_config = 18;
+  string aircraft_version = 19;
+  string flight_type = 20;
+  string actual_departure_airport = 21;
+  string actual_arrival_airport = 22;
+  string departure_gate = 23;
+  string arrival_gate = 24;
+  ActualTimes actual_times = 25;
+  EstimatedTimes estimated_times = 26;
+  int32 pax_booked = 27;
+  int32 pax_flown = 28;
+  repeated Delay delays = 29;
+  int32 bags_booked = 30;
+  repeated Fuel fuels = 31;
+  bool crew_checked_in = 32;
+  bool star_flight = 33;
+  string desk = 34;
+}
+
+message ActualTimes {
+  string actual_block_off = 1;
+  string actual_take_off = 2;
+  string actual_touch_down = 3;
+  string actual_block_on = 4;
+}
+
+message EstimatedTimes {
+  string estimated_block_off = 1;
+  string estimated_take_off = 2;
+  string estimated_touch_down = 3;
+  string estimated_block_on = 4;
+}
+
+message Delay{
+  string code = 1;
+  string code2 = 2;
+  string minutes = 3;
+}
+
+message Fuel {
+  string type = 1;
+  string source = 2;
+  string quantity = 3;
+  string quantity_unit = 4;
+  string density = 5;
+  string density_unit = 6;
+}
