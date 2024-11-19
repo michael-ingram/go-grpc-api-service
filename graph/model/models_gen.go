@@ -9,6 +9,11 @@ type ActualTimes struct {
 	ActualBlockOn   string `json:"actualBlockOn"`
 }
 
+type Coordinates struct {
+	Latitude  string `json:"latitude"`
+	Longitude string `json:"longitude"`
+}
+
 type Delay struct {
 	Code    string `json:"code"`
 	Code2   string `json:"code2"`
@@ -39,6 +44,11 @@ type Flight struct {
 	Fuels                     []*Fuel         `json:"fuels,omitempty"`
 }
 
+type FlightAndStations struct {
+	Flight   *Flight    `json:"flight"`
+	Stations []*Station `json:"stations"`
+}
+
 type Fuel struct {
 	Type         string `json:"type"`
 	Source       string `json:"source"`
@@ -48,5 +58,22 @@ type Fuel struct {
 	DensityUnit  string `json:"densityUnit"`
 }
 
+type LocationDetails struct {
+	CountryCode       string       `json:"countryCode"`
+	CityCode          string       `json:"cityCode"`
+	ProvinceStateCode string       `json:"provinceStateCode"`
+	TimeZoneCode      string       `json:"timeZoneCode"`
+	Coordinates       *Coordinates `json:"coordinates"`
+}
+
 type Query struct {
+}
+
+type Station struct {
+	Allowed         bool             `json:"allowed"`
+	LocationDetails *LocationDetails `json:"locationDetails"`
+	CurrencyCode    string           `json:"currencyCode"`
+	InActive        bool             `json:"inActive"`
+	FullName        string           `json:"fullName"`
+	StationCode     string           `json:"stationCode"`
 }

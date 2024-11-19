@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"go-api-service/graph/model"
+	"sync"
 )
 
 // Flight is the resolver for the flight field.
@@ -45,6 +46,129 @@ func (r *queryResolver) Flight(ctx context.Context, uniqueID string) (*model.Fli
 	}
 
 	return flight, nil
+}
+
+// Stations is the resolver for the stations field.
+func (r *queryResolver) Stations(ctx context.Context) ([]*model.Station, error) {
+	response, err := r.NavitaireClient.GetStations(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// Map the gRPC response to GraphQL models
+	stations := make([]*model.Station, len(response.Stations))
+	for i, s := range response.Stations {
+		stations[i] = &model.Station{
+			Allowed:      s.Allowed,
+			CurrencyCode: s.CurrencyCode,
+			InActive:     s.InActive,
+			FullName:     s.FullName,
+			StationCode:  s.StationCode,
+			LocationDetails: &model.LocationDetails{
+				CountryCode:       s.LocationDetails.CountryCode,
+				CityCode:          s.LocationDetails.CityCode,
+				ProvinceStateCode: s.LocationDetails.ProvinceStateCode,
+				TimeZoneCode:      s.LocationDetails.TimeZoneCode,
+				Coordinates: &model.Coordinates{
+					Latitude:  s.LocationDetails.Coordinates.Latitude,
+					Longitude: s.LocationDetails.Coordinates.Longitude,
+				},
+			},
+		}
+	}
+
+	return stations, nil
+}
+
+// FlightAndStations is the resolver for the flightAndStations field.
+func (r *queryResolver) FlightAndStations(ctx context.Context, uniqueID string) (*model.FlightAndStations, error) {
+	var wg sync.WaitGroup
+	var flight *model.Flight
+	var stations []*model.Station
+	var flightErr, stationsErr error
+
+	wg.Add(2)
+
+	go func() {
+		defer wg.Done()
+		flightResponse, err := r.NavblueClient.GetFlightById(ctx, uniqueID)
+		if err != nil {
+			flightErr = err
+			return
+		}
+		flight = &model.Flight{
+			UniqueID:                  flightResponse.UniqueId,
+			FlightNumber:              flightResponse.FlightNumber,
+			TailNumber:                flightResponse.TailNumber,
+			ScheduledDepartureAirport: flightResponse.ScheduledDepartureAirport,
+			ScheduledArrivalAirport:   flightResponse.ScheduledArrivalAirport,
+			Std:                       flightResponse.Std,
+			Sta:                       flightResponse.Sta,
+			OffsetDa:                  flightResponse.OffsetDa,
+			OffsetAa:                  flightResponse.OffsetAa,
+			DepartureGate:             flightResponse.DepartureGate,
+			ActualTimes: &model.ActualTimes{
+				ActualBlockOff:  flightResponse.ActualTimes.ActualBlockOff,
+				ActualTakeOff:   flightResponse.ActualTimes.ActualTakeOff,
+				ActualTouchDown: flightResponse.ActualTimes.ActualTouchDown,
+				ActualBlockOn:   flightResponse.ActualTimes.ActualBlockOn,
+			},
+			EstimatedTimes: &model.EstimatedTimes{
+				EstimatedBlockOff:  flightResponse.EstimatedTimes.EstimatedBlockOff,
+				EstimatedTakeOff:   flightResponse.EstimatedTimes.EstimatedTakeOff,
+				EstimatedTouchDown: flightResponse.EstimatedTimes.EstimatedTouchDown,
+				EstimatedBlockOn:   flightResponse.EstimatedTimes.EstimatedBlockOn,
+			},
+			Delays: mapDelays(flightResponse.Delays),
+			Fuels:  mapFuels(flightResponse.Fuels),
+		}
+	}()
+
+	// Fetch Stations concurrently
+	go func() {
+		defer wg.Done()
+		stationsResponse, err := r.NavitaireClient.GetStations(ctx)
+		if err != nil {
+			stationsErr = err
+			return
+		}
+		stations = make([]*model.Station, len(stationsResponse.Stations))
+		for i, s := range stationsResponse.Stations {
+			stations[i] = &model.Station{
+				Allowed:      s.Allowed,
+				CurrencyCode: s.CurrencyCode,
+				InActive:     s.InActive,
+				FullName:     s.FullName,
+				StationCode:  s.StationCode,
+				LocationDetails: &model.LocationDetails{
+					CountryCode:       s.LocationDetails.CountryCode,
+					CityCode:          s.LocationDetails.CityCode,
+					ProvinceStateCode: s.LocationDetails.ProvinceStateCode,
+					TimeZoneCode:      s.LocationDetails.TimeZoneCode,
+					Coordinates: &model.Coordinates{
+						Latitude:  s.LocationDetails.Coordinates.Latitude,
+						Longitude: s.LocationDetails.Coordinates.Longitude,
+					},
+				},
+			}
+		}
+	}()
+
+	// Wait for both goroutines to finish
+	wg.Wait()
+
+	// Handle errors from either gRPC call
+	if flightErr != nil {
+		return nil, flightErr
+	}
+	if stationsErr != nil {
+		return nil, stationsErr
+	}
+
+	return &model.FlightAndStations{
+		Flight:   flight,
+		Stations: stations,
+	}, nil
 }
 
 // Query returns QueryResolver implementation.

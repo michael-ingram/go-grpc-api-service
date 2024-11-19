@@ -1,0 +1,35 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+
+package navitaire;
+option go_package = "../pb";
+
+service NavitaireService {
+    rpc GetStations (google.protobuf.Empty) returns (GetStationsResponse);
+}
+
+message GetStationsResponse {
+    repeated Station stations = 1;
+}
+
+message Station {
+    bool allowed = 1;
+    LocationDetail location_details = 2;
+    string currency_code = 3;
+    bool in_active = 4;
+    string full_name = 5;
+    string station_code = 6;
+}
+
+message LocationDetail {
+    string country_code = 1;
+    string city_code = 2;
+    string province_state_code = 3;
+    string time_zone_code = 4;
+    Coordinate coordinates = 5;
+}
+
+message Coordinate {
+    string latitude = 1;
+    string longitude = 2;
+}

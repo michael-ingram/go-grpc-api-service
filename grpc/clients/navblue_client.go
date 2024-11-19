@@ -23,7 +23,7 @@ func NewNavblueClient(address string) *NavblueClient {
 	// Create a connection to the gRPC server
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
-		log.Fatalf("could not connect to gRPC server at %s: %v", address, err)
+		log.Fatalf("could not connect to Navblue gRPC server at %s: %v", address, err)
 	}
 
 	// Create a new NavblueService client
@@ -35,7 +35,6 @@ func NewNavblueClient(address string) *NavblueClient {
 	}
 }
 
-// Close closes the gRPC connection
 func (c *NavblueClient) Close() error {
 	if c.conn != nil {
 		return c.conn.Close()

@@ -11,7 +11,8 @@ import (
 // It serves as dependency injection for your app, add any dependencies you require here.
 
 type Resolver struct {
-	NavblueClient *grpc.NavblueClient
+	NavblueClient   *grpc.NavblueClient
+	NavitaireClient *grpc.NavitaireClient
 }
 
 func mapDelays(delays []*pb.Delay) []*model.Delay {

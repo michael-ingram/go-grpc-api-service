@@ -5,7 +5,8 @@ import (
 )
 
 type Config struct {
-	GrpcNavblueAddr string
+	GrpcNavblueAddr   string
+	GrpcNavitaireAddr string
 }
 
 func LoadConfiguration() *Config {
@@ -15,12 +16,13 @@ func LoadConfiguration() *Config {
 		grpcNavblueAddr = "127.0.0.1:50051" // Default address
 	}
 
-	//grpcManifestAddr := os.Getenv("GRPC_MANIFEST_ADDR")
-	//if grpcManifestAddr == "" {
-	//	grpcManifestAddr = "localhost:50052" // Default address
-	//}
+	grpcNavitaireAddr := os.Getenv("GRPC_NAVITAIRE_ADDR")
+	if grpcNavitaireAddr == "" {
+		grpcNavitaireAddr = "127.0.0.1:50052" // Default address
+	}
 
 	return &Config{
-		GrpcNavblueAddr: grpcNavblueAddr,
+		GrpcNavblueAddr:   grpcNavblueAddr,
+		GrpcNavitaireAddr: grpcNavitaireAddr,
 	}
 }

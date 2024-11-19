@@ -48,10 +48,40 @@ type Fuel {
     densityUnit: String!
 }
 
+type Station {
+    allowed: Boolean!
+    locationDetails: LocationDetails!
+    currencyCode: String!
+    inActive: Boolean!
+    fullName: String!
+    stationCode: String!
+}
+
+type LocationDetails {
+    countryCode: String!
+    cityCode: String!
+    provinceStateCode: String!
+    timeZoneCode: String!
+    coordinates: Coordinates!
+}
+
+type Coordinates {
+    latitude: String!
+    longitude: String!
+}
+
+type FlightAndStations {
+    flight: Flight!
+    stations: [Station!]!
+}
+
 
 type Query {
-  flight(uniqueId: String!): Flight!
+    flight(uniqueId: String!): Flight!
+    stations: [Station!]!
+    flightAndStations(uniqueID: String!): FlightAndStations!
 }
+
 
 #type Mutation {
 #  createTodo(input: NewTodo!): Todo!
